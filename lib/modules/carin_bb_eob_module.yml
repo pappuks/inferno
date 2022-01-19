@@ -1,0 +1,21 @@
+name: carin_bb_eob
+resource_path: carinbbeob
+description: Carin Blue Button ExplanationOfBenefit
+fhir_version: r4
+default_test_set: ad_hoc_testing
+test_sets:
+  ad_hoc_testing:
+    view: default
+    tests: 
+      - name: Discovery
+        overview: >
+          This is an overview of the Discovery group
+        sequences:
+          - CapabilityStatementSequence
+        run_all: false
+      - name: CARIN BlueButton ExplanationOfBenefit
+        overview: >
+          This an overview of the Carin BB EOB profile tests
+        sequences:
+          - CarinBlueButtonExplanationOfBenefitSequence
+        run_all: true

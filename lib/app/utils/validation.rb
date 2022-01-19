@@ -60,6 +60,15 @@ module Inferno
       snf: 'https://bluebutton.cms.gov/assets/ig/StructureDefinition-bluebutton-snf-claim'
     }.freeze
 
+    CARIN_BB_EOB_URIS = {
+      inpatient_institutional: 'http://hl7.org/fhir/us/carin-bb/StructureDefinition/C4BB-ExplanationOfBenefit-Inpatient-Institutional',
+      oral: 'http://hl7.org/fhir/us/carin-bb/StructureDefinition/C4BB-ExplanationOfBenefit-Oral',
+      outpatient_institutional: 'http://hl7.org/fhir/us/carin-bb/StructureDefinition/C4BB-ExplanationOfBenefit-Outpatient-Institutional',
+      pharmacy: 'http://hl7.org/fhir/us/carin-bb/StructureDefinition/C4BB-ExplanationOfBenefit-Pharmacy',
+      professional_nonclinician: 'http://hl7.org/fhir/us/carin-bb/StructureDefinition/C4BB-ExplanationOfBenefit-Professional-NonClinician',
+      eob_base: 'http://hl7.org/fhir/us/carin-bb/StructureDefinition/C4BB-ExplanationOfBenefit'
+    }.freeze
+
     US_CORE_R4_URIS = {
       smoking_status: 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-smokingstatus',
       diagnostic_report_lab: 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab',
@@ -194,6 +203,20 @@ module Inferno
         return DEFINITIONS[US_CORE_R4_URIS[:diagnostic_report_lab]] if resource_contains_category(resource, 'LAB', 'http://terminology.hl7.org/CodeSystem/v2-0074')
 
         return DEFINITIONS[US_CORE_R4_URIS[:diagnostic_report_note]]
+      # Special cases where there are multiple profiles per Resource type
+      elsif resource.resourceType == 'ExplanationOfBenefit'
+          
+        return DEFINITIONS[CARIN_BB_EOB_URIS[:inpatient_institutional]] if eob_contains_type(resource,'institutional', 'inpatient')
+      
+        return DEFINITIONS[CARIN_BB_EOB_URIS[:oral]] if eob_contains_type(resource, 'oral')
+      
+        return DEFINITIONS[CARIN_BB_EOB_URIS[:outpatient_institutional]] if eob_contains_type(resource, 'institutional', 'outpatient')
+      
+        return DEFINITIONS[CARIN_BB_EOB_URIS[:pharmacy]] if eob_contains_type(resource, 'pharmacy')
+      
+        return DEFINITIONS[CARIN_BB_EOB_URIS[:professional_nonclinician]] if eob_contains_type(resource, 'professional', 'vision')
+      
+        return DEFINITIONS[CARIN_BB_EOB_URIS[:eob_base]]
       end
 
       candidates.first
@@ -201,6 +224,10 @@ module Inferno
 
     def self.observation_contains_code(observation_resource, code)
       observation_resource&.code&.coding&.any? { |coding| coding&.code == code }
+    end
+
+    def self.eob_contains_type(eob_resource, type, subtype = nil)
+      eob_resource&.type&.coding&.any? { |coding| coding&.code == type } && (subtype.blank? || eob_resource&.subType&.blank? || eob_resource&.subType&.coding&.any? { |subcoding| subcoding&.code == subtype })
     end
 
     def self.resource_contains_category(resource, category_code, category_system = nil)

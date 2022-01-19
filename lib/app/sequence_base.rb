@@ -62,6 +62,7 @@ module Inferno
         @client = client
         @instance = instance
         @client.set_bearer_token(@instance.token) unless @client.nil? || @instance.nil? || @instance.token.nil?
+        #@client.additional_headers = { 'X-Service-Token' => "Bearer #{@instance.token}" }
         @client&.monitor_requests
         @sequence_result = sequence_result
         @disable_tls_tests = disable_tls_tests
@@ -670,6 +671,17 @@ module Inferno
         )
 
         references = @instance.resource_references.where(profile: specified_profile)
+
+        Inferno.logger.info "Within test resources: [#{@instance.resource_references.present?}] [#{references.present?}] [#{@instance.resource_references.where(resource_type: resource_type).length}]"
+
+        @instance.resource_references.each do |resourceref|
+          Inferno.logger.info " Withing resource_reference: #{resourceref.resource_id} #{resourceref.resource_type}"
+          if resourceref.resource_type == resource_type
+            res = fetch_resource(resource_type, resourceref.resource_id)
+            Inferno.logger.info " Withing resource_reference_profile: #{res.meta&.profile} "
+          end
+        end
+        
         resources =
           if references.present?
             references.map(&:resource_id).map do |resource_id|
