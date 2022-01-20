@@ -35,7 +35,8 @@ module Inferno
           skip 'Could not verify this functionality when bearer token is not set' if @instance.token.blank?
   
           reply = get_resource_by_params(versioned_resource_class('ExplanationOfBenefit'), patient: @instance.patient_id)
-          @client.set_bearer_token(@instance.token)
+          # No need to set bearer token when working with InAPI
+          #@client.set_bearer_token(@instance.token)
           assert_response_unauthorized reply
         end
   

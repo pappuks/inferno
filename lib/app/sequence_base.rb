@@ -62,6 +62,7 @@ module Inferno
         @client = client
         @instance = instance
         #@client.set_bearer_token(@instance.token) unless @client.nil? || @instance.nil? || @instance.token.nil?
+        #work with InAPI
         @client.additional_headers = { 'X-Service-Token' => "Bearer #{@instance.token}" }
         @client&.monitor_requests
         @sequence_result = sequence_result
