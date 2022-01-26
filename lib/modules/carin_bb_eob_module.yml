@@ -1,5 +1,5 @@
 name: carin_bb_eob
-resource_path: carinbbeob
+resource_path: carinbbeob-1.0.0
 description: Carin Blue Button ExplanationOfBenefit
 fhir_version: r4
 default_test_set: ad_hoc_testing
